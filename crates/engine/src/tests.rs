@@ -3548,4 +3548,8 @@ v11	keep	11
     s.execute("selection.set", json!({"range": "A1:A3"})).unwrap();
     s.execute("range.fill", json!({"input": "Z"})).unwrap();
     assert_eq!(v(&s, "A2"), Value::from("Z"));
+fn saving_csv_keeps_leading_empty_columns_and_rows() {
+    let wb = gridcraft_xlsx::read_csv(b",x\r\n\r\n,,y\r\n", &gridcraft_xlsx::CsvOptions::default()).unwrap();
+    let out = crate::io::save_bytes(&wb, "a.csv").unwrap();
+    assert_eq!(String::from_utf8(out).unwrap(), ",x,\r\n,,\r\n,,y\r\n");
 }
