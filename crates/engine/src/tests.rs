@@ -867,6 +867,8 @@ fn clearing_a_filtered_selection_leaves_the_rows_the_filter_hides() {
     s.execute("edit.clearContents", json!({"range": "A3:A5"})).unwrap();
     assert_eq!(v(&s, "A3"), Value::Empty);
     assert_eq!(v(&s, "A5"), Value::Empty);
+}
+
 /// Sorting a selected column (or the whole column) keeps the neighbouring columns' rows together,
 /// from Sort Z to A and from the Custom Sort dialog alike.
 #[test]
@@ -3037,10 +3039,7 @@ fn sort_and_remove_duplicates_move_the_rows_notes_and_links() {
     let notes_and_links = |s: &Session| {
         let sh = s.doc().unwrap().wb.active().unwrap().clone();
         let cells = ["B2", "B3", "B4", "B5"].map(|c| CellRef::parse(c).unwrap());
-        (
-            cells.map(|c| sh.comments.get(&c).map(|m| m.text.clone())),
-            cells.map(|c| sh.hyperlinks.get(&c).map(|h| h.target.clone())),
-        )
+        (cells.map(|c| sh.comments.get(&c).map(|m| m.text.clone())), cells.map(|c| sh.hyperlinks.get(&c).map(|h| h.target.clone())))
     };
 
     // Sort ascending with unique keys d,a,e,b,c: the order becomes a(2), b(4), c(5), d(1), e(3).
@@ -3442,6 +3441,8 @@ fn editing_quote_prefixed_text_keeps_it_text() {
     s.execute("cell.set", json!({"cell": "B1", "input": "hello"})).unwrap();
     let d = s.doc().unwrap();
     assert_eq!(crate::display::edit_text(&d.wb, d.wb.active().unwrap(), CellRef::parse("B1").unwrap()), "hello");
+}
+
 /// #1101: repeating one cell or row down a filtered selection (paste, Ctrl+Enter, Fill Down) skips
 /// the rows the filter hides, as in Excel. A taller pasted block goes straight down, and rows
 /// hidden by hand are written, also as in Excel (each case measured in Excel for Microsoft 365).
@@ -3548,6 +3549,9 @@ v11	keep	11
     s.execute("selection.set", json!({"range": "A1:A3"})).unwrap();
     s.execute("range.fill", json!({"input": "Z"})).unwrap();
     assert_eq!(v(&s, "A2"), Value::from("Z"));
+}
+
+#[test]
 fn saving_csv_keeps_leading_empty_columns_and_rows() {
     let wb = gridcraft_xlsx::read_csv(b",x\r\n\r\n,,y\r\n", &gridcraft_xlsx::CsvOptions::default()).unwrap();
     let out = crate::io::save_bytes(&wb, "a.csv").unwrap();

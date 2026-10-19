@@ -1278,11 +1278,6 @@ pub(crate) fn rewrite_all_formulas(wb: &mut gridcraft_model::Workbook, target: &
 
 // ---------------------------------------------------------------- clear
 
-/// The rows of `range` an applied filter hides (rows hidden by hand are not among them).
-fn filtered_rows(sh: &gridcraft_model::Sheet, range: RangeRef) -> std::collections::BTreeSet<u32> {
-    sh.rows.range(range.start.row..=range.end.row).filter(|(r, info)| info.hidden && sh.is_row_filtered(**r)).map(|(r, _)| *r).collect()
-}
-
 /// The Clear commands (Delete is Clear Contents). As in Excel, the rows an applied filter hides
 /// are left as they are; rows hidden by hand are cleared.
 fn clear(s: &mut Session, p: &Json, what: &str) -> Result<Json> {
